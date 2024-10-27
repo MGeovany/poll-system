@@ -12,7 +12,6 @@ public class Poll {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID id;
-    
     private String title;
     private String uniqueUrl;
 

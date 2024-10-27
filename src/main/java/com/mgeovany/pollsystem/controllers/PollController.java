@@ -7,6 +7,7 @@ import com.mgeovany.pollsystem.models.Option;
 import com.mgeovany.pollsystem.models.Poll;
 import com.mgeovany.pollsystem.repositories.OptionRepository;
 import com.mgeovany.pollsystem.repositories.PollRepository;
+import com.mgeovany.pollsystem.utils.GenerateRandomUrl;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 @RestController
@@ -32,7 +32,7 @@ public class PollController {
     public ResponseEntity<PollResponse> createPoll(@RequestBody PollCreationRequest pollRequest) {
         Poll poll = new Poll();
         poll.setTitle(pollRequest.getTitle());
-        poll.setUniqueUrl(UUID.randomUUID().toString());
+        poll.setUniqueUrl(GenerateRandomUrl.generateUniqueUrl(6));
     
         List<Option> options = new ArrayList<>();
         for (String optionText : pollRequest.getOptions()) {
@@ -80,9 +80,9 @@ public class PollController {
         return ResponseEntity.ok(pollResponses);
     }
 
-    @GetMapping("/{pollId}")
-    public ResponseEntity<PollResponse> getPollById(@PathVariable UUID pollId) {   
-        return pollRepository.findById(pollId)
+    @GetMapping("/{pollUrl}")
+    public ResponseEntity<PollResponse> getPollById(@PathVariable String pollUrl) {   
+        return pollRepository.findByUniqueUrl(pollUrl)
                 .map(poll -> {
                     List<String> optionTexts = poll.getOptions().stream()
                             .map(option -> option.getText())
