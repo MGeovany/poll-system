@@ -132,4 +132,22 @@ public class PollController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
+    @DeleteMapping("/{pollUrl}")
+    public ResponseEntity<PollResponse> deletePoll(@PathVariable String pollUrl) {
+        return pollRepository.findByUniqueUrl(pollUrl)
+                .map(poll -> {
+                    List<String> optionTexts = poll.getOptions().stream()
+                            .map(Option::getText)
+                            .collect(Collectors.toList());
+                    PollResponse pollResponse = new PollResponse(
+                            poll.getId(),
+                            poll.getTitle(),
+                            poll.getUniqueUrl(),
+                            optionTexts);
+                    pollRepository.delete(poll);
+                    return ResponseEntity.ok(pollResponse);
+                })
+                .orElse(ResponseEntity.notFound().build());
+    }
+
 }
